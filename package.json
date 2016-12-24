@@ -1,0 +1,27 @@
+{
+  "name": "twitter-slider",
+  "version": "1.0.0",
+  "description": "Formats user's recent tweets to json for use in front end slider on website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gmarzloff/twitter-slider.git"
+  },
+  "keywords": [
+    "twitter",
+    "slider"
+  ],
+  "author": "George Marzloff",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gmarzloff/twitter-slider/issues"
+  },
+  "homepage": "https://github.com/gmarzloff/twitter-slider#readme",
+  "dependencies": {
+    "lets-get-meta": "^1.0.0",
+    "twitter": "^1.7.0"
+  }
+}

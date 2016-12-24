@@ -1,0 +1,20 @@
+// config.js
+
+// Instructions:
+// 1. Copy config.js.editme to config.js
+// 2. Open config.js instead, and add your API authentication data there
+// 3. config.js is part of the .gitignore file to keep your secrets safe
+
+module.exports = {
+
+	twitter = {
+		consumer_key: 			'',
+  		consumer_secret: 		'',
+  		access_token_key: 		'',
+  		access_token_secret: 	'',
+  		screen_name: 				'' 	// will search for tweets from this user
+	}
+
+};
+
+
