@@ -86,7 +86,8 @@ client.get('statuses/user_timeline', params, function(error, tweets, response) {
             writeTweetsToFile();
           }
       }
-    }
+
+    } // end of for loop
   
   }else{ // end if(!error)
     console.log(err);
@@ -102,7 +103,7 @@ function fetchWrapper(index, found_url, callback){
     filtered_tweets[index].metadata = data;
     console.log("new tweet object for " + found_url + ": \n" + filtered_tweets[index]);
     callback();
-    
+
   });
 }
 
