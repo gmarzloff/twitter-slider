@@ -11,10 +11,14 @@ There are 2 parts to this project.
 
 ## Installation
 
-1. Clone the project
+1. Clone the project, cd to the project directory
 2. Run ``` npm install ```
+3. Create the config.js file and add your [Twitter API app credentials](https://apps.twitter.com/) to this file.
+```
+$ cp config/config.js.editme config/config.js
+```
 
-## Generating JSON data source 
+## Generate the JSON data source 
 1. The node script is designed to run in the server background and can be run with [forever](https://github.com/foreverjs/forever) to accomplish this. 
 
 ```
@@ -43,3 +47,4 @@ The tweet objects produced in the json have the following structure:
 ```
 ## Front-end Slider
 
+The slider is available in the www/ folder. You can create a symbolic link to your web server directory like so:

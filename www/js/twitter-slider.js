@@ -20,7 +20,7 @@ $(document).ready(function() {
 				content += "</a></div>\n<div class=\"tweet_details\"><h3><a href=\""+data[i].url+"\">"+data[i].metadata.title+"</a></h3>\n<p>"+( data[i].summary ? parseURLsInString(data[i].summary) : "") +"</p>\n";
          		
          		if(data[i].status_text.length>0){
-           			content += "<div class=\"owner-comment\">"+ parseURLsInString(data[i].status_text) +" -gm</div></div>";
+           			content += "<div class=\"owner-comment\">"+ parseURLsInString(data[i].status_text) +"</div></div>";
           		}
           		
 	        }
