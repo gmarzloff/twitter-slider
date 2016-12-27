@@ -10,7 +10,7 @@ var Twitter = require('twitter'),
        meta = require('./meta_utils');
 
 var client = new Twitter(config.twitter);
-var json_filename = 'twitterdump.json';     // Filename for your filtered tweets
+var json_filename = 'www/tweets.json';     // Filename for your filtered tweets
 
 // Defines the filtering parameters. See descriptions here: 
 // https://dev.twitter.com/rest/reference/get/statuses/user_timeline
@@ -41,17 +41,13 @@ client.get('statuses/user_timeline', params, function(error, tweets, response) {
       var t = tweets[i];        // convenience var
       var populated_url = '';   // parsing to get the url, depending on whether the status is new or retweet
 
+      meta.printObject(t);
+
       filtered_tweets[i] = {
         created_at: t.created_at,
         status_text: t.text,
-        entities: {
-          urls: [
-            {
-              url: t.entities.urls.url,
-              display_url: t.entities.urls.display_url,
-            }
-          ]
-        },
+        url: (t.entities.urls[0] != undefined && t.entities.urls[0].url != undefined) ? t.entities.urls[0].url  : "",
+        display_url: (t.entities.urls[0] != undefined && t.entities.urls[0].display_url != undefined) ? t.entities.urls[0].display_url : ""
       };
 
       if (("urls" in t.entities) && (t.entities.urls.length > 0) && ("expanded_url" in t.entities.urls[0])) {
@@ -73,6 +69,7 @@ client.get('statuses/user_timeline', params, function(error, tweets, response) {
 
             if(tasksRemainingCount==0){
               // all tweets have been processed. save filtered_tweets object to file
+              // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
               writeTweetsToFile();
             }
         });
@@ -83,6 +80,7 @@ client.get('statuses/user_timeline', params, function(error, tweets, response) {
 
          if(tasksRemainingCount==0){
             // all tweets have been processed. save filtered_tweets object to file
+            // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
             writeTweetsToFile();
           }
       }
@@ -101,7 +99,7 @@ function fetchWrapper(index, found_url, callback){
   meta.fetchTagsFromURL(found_url, function(data){
     
     filtered_tweets[index].metadata = data;
-    console.log("new tweet object for " + found_url + ": \n" + filtered_tweets[index]);
+    console.log("new tweet object for " + found_url + ": \n" + JSON.stringify(filtered_tweets[index],null,4));
     callback();
 
   });
@@ -117,5 +115,12 @@ function writeTweetsToFile(){
     console.log("File saved to: " + full_path_filename_string);
   });
 
+}
+
+function dateSortFunction(a,b){
+    // If you need to sort the dates in ascending order. Tweets will be in descending order by default from twitter.
+    var dateA = new Date(a.created_at).getTime();
+    var dateB = new Date(b.created_at).getTime();
+    return dateA > dateB ? 1 : -1;
 }
 

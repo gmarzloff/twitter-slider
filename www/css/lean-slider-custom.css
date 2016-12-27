@@ -1,0 +1,164 @@
+
+/*
+ * Lean Slider Sample Styles From 
+ * http://dev7studios.com/lean-slider
+ */
+
+@import url('https://fonts.googleapis.com/css?family=Alegreya');
+
+.slider-wrapper { 
+    position: relative; 
+    /*background: rgb(48, 75, 102) ; */
+    border: 2px solid gray;
+    -moz-box-shadow: 0 0 3px rgba(0,0,0,0.4);
+    -webkit-box-shadow: 0 0 3px rgba(0,0,0,0.4);
+    box-shadow: 0 0 3px rgba(200,200,200,0.4);
+    width: 700px;
+    margin: 0 auto;
+    min-height: 300px;
+}
+#slider {
+    padding: 20px;
+}
+.lean-slider { overflow: hidden; background-color: /*rgb(48, 75, 102)*/ white;}
+.lean-slider-slide {
+    display: block;
+    position: relative;
+    opacity: 0;
+    -webkit-transition: opacity 0.6s linear;
+    -moz-transition: opacity 0.6s linear;
+    -ms-transition: opacity 0.6s linear;
+    -o-transition: opacity 0.6s linear;
+    transition: opacity 0.6s linear;
+    z-index: 10;
+}
+.lean-slider-slide.current { opacity: 1; }
+.lean-slider-slide img { 
+    display: block;
+    width: 100%; 
+}
+
+#slider-direction-nav {
+    position: absolute;
+    left: 0;
+    top: 47%;
+    width: 100%;
+    -webkit-transition: opacity 0.2s linear;
+    -moz-transition: opacity 0.2s linear;
+    -ms-transition: opacity 0.2s linear;
+    -o-transition: opacity 0.2s linear;
+    transition: opacity 0.2s linear;
+    opacity: 0.2;
+    z-index: 1000;
+}
+.slider-wrapper:hover #slider-direction-nav { opacity: 1; }
+#slider-direction-nav a {
+    float: left;
+    display: block;
+    width: 26px;
+    height: 37px;
+    background: url('../img/arrows.png') no-repeat 0 0;
+    text-indent: -9999px;
+}
+#slider-direction-nav .lean-slider-next {
+    float: right;
+    background-position: 100% 0;
+}
+
+#slider-control-nav {
+    left: 0;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    -webkit-transition: opacity 0.2s linear;
+    -moz-transition: opacity 0.2s linear;
+    -ms-transition: opacity 0.2s linear;
+    -o-transition: opacity 0.2s linear;
+    transition: opacity 0.2s linear;
+    opacity: 0.2;
+    z-index: 1000;
+}
+.slider-wrapper:hover #slider-control-nav { opacity: 1; }
+
+#slider-control-nav a {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background: url('../img/bullets.png') no-repeat 0 0;
+    text-indent: -9999px;
+    margin: 0 3px;
+    -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+#slider-control-nav a.active { background-position: 100% 0; }
+
+#slidercaption{
+    color: #ddd;
+    text-align: center;
+    font-style: italic;
+    font-size: 1.5em;
+}
+
+
+.tweet_details{
+    padding: 5px 30px 30px 5px;
+    margin: 5px 20px 5px 20px;
+}
+.tweet_details h3 {margin: 0;}
+.tweet_details a {font-size: 1.4em; text-decoration: none;}
+
+.owner-comment {
+    padding-bottom: 20px;
+    font-family: 'Goudy Old Style', Palatino;
+    font-style: italic;
+    color: black;
+    font-size: 1.2em;
+}
+
+h1 {
+    font-family: 'Alegreya', serif;
+    text-align: center;
+    font-size: 3em;
+}
+
+h3{
+    font-family: 'Alegreya', serif;
+    font-size: 1.4em;
+    line-height: 1.2em;
+}
+.tweet_img {
+    min-height: 300px;
+    max-height: 350px;
+    width: 600px;
+    overflow: hidden;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-bottom: 5px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.tweet_img img {
+    max-width: 600px;
+}
+
+.tweet-only-card {
+    width: 600px;
+    min-height: 200px;
+    padding: 20px;
+}
+.tweet-only-card .logo {
+    float: left;
+}
+.tweet-only-card img{
+    width: 150px;
+
+}
+
+.tweet-text {
+    font-family: 'Alegreya', serif;
+    font-size: 30px;
+}
