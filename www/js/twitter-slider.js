@@ -21,13 +21,14 @@ $(document).ready(function() {
 				}else{
 					content += "<img src=\"" + placeholderImg + "\" />";
 				}
-				content += "</a></div>\n<div class=\"tweet_details\"><h3><a href=\""+data[i].url+"\">"+data[i].metadata.title+"</a></h3>\n<p>"+(data[i].summary ? data[i].summary:"") +"</p>\n";
+				content += "</a></div>\n<div class=\"tweet_details\"><h3><a href=\""+data[i].url+"\">"+data[i].metadata.title+"</a></h3>\n<p>"+( data[i].summary ? parseURLsInString(data[i].summary) : "") +"</p>\n";
          		
          		if(data[i].status_text.length>0){
-           			content += "<div class=\"owner-comment\">"+data[i].status_text+" -gm</div></div>";
+           			content += "<div class=\"owner-comment\">"+ parseURLsInString(data[i].status_text) +" -gm</div></div>";
           		}
+          		
 	        }
-	        
+
 	        $("#slider").append("<div>"+content+"</div>\n");
 	    }
 
@@ -50,8 +51,15 @@ function generateTweetOnlyCard(tweet){
 	if(tweet.metadata.description.length > 0){
 		htmlString +=  '<p>' + tweet.metadata.description + '</p>';
 	}
-
+	htmlString = parseURLsInString(htmlString);
 	htmlString += '</div></div>';
 
 	return htmlString;
+}
+
+function parseURLsInString(text) {
+    var urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    return text.replace(urlRegex, function(url) {
+        return '<a target="twitterlinks" href="' + url + '">' + url + '</a>';
+    });
 }

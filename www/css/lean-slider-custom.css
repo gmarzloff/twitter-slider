@@ -102,7 +102,6 @@
     font-size: 1.5em;
 }
 
-
 .tweet_details{
     padding: 5px 30px 30px 5px;
     margin: 5px 20px 5px 20px;
@@ -115,7 +114,10 @@
     font-family: 'Goudy Old Style', Palatino;
     font-style: italic;
     color: black;
-    font-size: 1.2em;
+    font-size: 1.4em;
+}
+.owner-comment a{
+    font-size: 1.0em;
 }
 
 h1 {
@@ -136,7 +138,7 @@ h3{
     overflow: hidden;
     margin: 0 auto;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    margin-bottom: 5px;
+    margin-bottom: 15px;
     text-align: center;
     vertical-align: middle;
 }
