@@ -16,11 +16,7 @@ $(document).ready(function() {
 			}else{
 			
 		        content = "<div class=\"tweet_img\"><a href=\""+data[i].url+"\">";
-				if(data[i].metadata.image_src){
-					content += "<img src=\"" + data[i].metadata.image_src + "\" />";
-				}else{
-					content += "<img src=\"" + placeholderImg + "\" />";
-				}
+				content += "<img src=\"" + data[i].metadata.image_src + "\" />";
 				content += "</a></div>\n<div class=\"tweet_details\"><h3><a href=\""+data[i].url+"\">"+data[i].metadata.title+"</a></h3>\n<p>"+( data[i].summary ? parseURLsInString(data[i].summary) : "") +"</p>\n";
          		
          		if(data[i].status_text.length>0){
