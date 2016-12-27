@@ -22,6 +22,7 @@
   "homepage": "https://github.com/gmarzloff/twitter-slider#readme",
   "dependencies": {
     "lets-get-meta": "^1.0.0",
+    "node-crontab": "0.0.8",
     "twitter": "^1.7.0"
   }
 }

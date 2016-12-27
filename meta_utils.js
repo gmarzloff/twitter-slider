@@ -44,7 +44,7 @@ module.exports = {
 
 				var data = getMeta(body);
 
-				// module.exports.printObject(data); // Show object created of all data
+				// module.exports.printObject(data); // Uncmoment to log object created from metadata
 				
 				var metaObject = {
 					title: extractValueFromArrayOfPossibleKeys(data, ['title', 'twitter:title']),
