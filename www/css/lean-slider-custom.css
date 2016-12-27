@@ -156,10 +156,13 @@ h3{
 }
 .tweet-only-card img{
     width: 150px;
-
 }
 
 .tweet-text {
     font-family: 'Alegreya', serif;
     font-size: 30px;
+}
+
+.tweet-text a {
+    text-decoration: none;
 }
