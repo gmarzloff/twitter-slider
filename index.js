@@ -28,16 +28,23 @@ var params = {
 var filtered_tweets = [];
 var      dir_string = path.dirname(fs.realpathSync(__filename));
 
+// Execute script once now immediately to avoid waiting for cron schedule
+doGetStatusUpdates();
+
 var fetch_tweets_cronjob = crontab.scheduleJob("*/30 * * * *", function(){
   // cron syntax: "*/30 * * * *" means every 30 minutes.
   // See here for more info: http://www.adminschoice.com/crontab-quick-reference
-  // To make script run once immediately, comment out the var fetch_tweets_cronjob line above 
-  // and its closing braces below to unwrap the client.get() function
+
+  doGetStatusUpdates();
+
+});
+
+function doGetStatusUpdates(){
 
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
     if (!error) {
 
-    	// Filter the tweets by shared links
+      // Filter the tweets by shared links
       // only take these data: created_at, text, picture,summary,title,url,display_url,
       // scrape the meta-tags for title, description, image-src
 
@@ -99,7 +106,7 @@ var fetch_tweets_cronjob = crontab.scheduleJob("*/30 * * * *", function(){
     } 
 
   });
-});
+}
 
 function fetchWrapper(index, found_url, callback){
    // this wrapper function is needed because we use a callback within a for loop and need to refer to
