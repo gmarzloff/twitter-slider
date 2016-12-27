@@ -15,7 +15,7 @@ There are 2 parts to this project.
 2. Run ``` npm install ```
 
 ## Generating JSON data source 
-1. The node script is designed to run in the server background and can be run with (forever)[https://github.com/foreverjs/forever] to accomplish this. 
+1. The node script is designed to run in the server background and can be run with [forever](https://github.com/foreverjs/forever) to accomplish this. 
 
 ```
 $ npm install forever -g
@@ -24,7 +24,7 @@ $ cd the/path/of/twitter-slider
 $ forever start index.js
 ```
 The tweet objects produced in the json have the following structure: 
-```
+```javascript
 [
   {
     "created_at": "Tue Dec 27 18:17:33 +0000 2016",
