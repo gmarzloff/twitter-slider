@@ -30,7 +30,7 @@ module.exports = {
 		var options = {
 			url: url,
 			followRedirect: true,
-			maxRedirects: 5,
+			maxRedirects: 15,
 			removeRefererHeader: true,
 			headers: {
 				'User-Agent': 'curl/7.49.1',	// spoof curl to obtain the target link
