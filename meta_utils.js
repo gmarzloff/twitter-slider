@@ -56,7 +56,8 @@ module.exports = {
 				callback(metaObject);
 
 			}else {
-				callback({status_code: response.statusCode});
+				console.log(err);
+				callback({status_code: err});
 			}
 		});
 
