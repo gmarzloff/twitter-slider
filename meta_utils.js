@@ -1,7 +1,8 @@
 var getMeta = require("lets-get-meta"),
          fs = require('fs'),
 	   path = require('path'),
-	request = require('request');
+	request = require('request'),
+  urlExists = require('url-exists');
 
 
 function extractValueFromArrayOfPossibleKeys(data, keys) {
