@@ -4,6 +4,8 @@ var getMeta = require("lets-get-meta"),
 	request = require('request'),
   urlExists = require('url-exists');
 
+var preferHTTPS = true;        // If true, will try to get the https link for images to avoid non-SSL material
+                               //loading on your personal https domain.
 
 function extractValueFromArrayOfPossibleKeys(data, keys) {
 	
@@ -17,6 +19,27 @@ function extractValueFromArrayOfPossibleKeys(data, keys) {
 		}
 	}
 	return dataString;
+}
+
+function getHttpsLinkIfAvailable(url, callback){
+       // This function will check if a url exists (for an image) that is https.
+       // You can avoid console warnings by using https requests only from your https site
+
+       if(url == '' || url.includes("https://")){
+            // image has no url or already is an https resource. bail!
+           callback(url);
+
+       }else if(url.includes("http://")){
+           // try to get the https version
+           var prefix = "http://";
+           var httpsURL = "https://" + url.substring(url.indexOf(prefix)+ prefix.length);
+
+           urlExists(httpsURL, function(err,exists){
+                   if(exists){
+                   		callback(httpsURL);
+                   }
+           });
+       }
 }
 
 module.exports = {
