@@ -23,6 +23,7 @@
   "dependencies": {
     "lets-get-meta": "^1.0.0",
     "node-crontab": "0.0.8",
-    "twitter": "^1.7.0"
+    "twitter": "^1.7.0",
+    "url-exists": "^1.0.3"
   }
 }
