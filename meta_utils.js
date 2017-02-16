@@ -2,7 +2,8 @@ var getMeta = require("lets-get-meta"),
          fs = require('fs'),
 	   path = require('path'),
 	request = require('request'),
-  urlExists = require('url-exists');
+  urlExists = require('url-exists'),
+      debug = require('debug')('meta_utils');
 
 var preferHTTPS = true;        // If true, will try to get the https link for images to avoid non-SSL material
                                //loading on your personal https domain.
@@ -21,13 +22,13 @@ function extractValueFromArrayOfPossibleKeys(data, keys) {
 	return dataString;
 }
 
-function getHttpsLinkIfAvailable(url, callback){
+function getHttpsLinkIfAvailable(url, linkcallback){
        // This function will check if a url exists (for an image) that is https.
        // You can avoid console warnings by using https requests only from your https site
 
        if(url == '' || url.includes("https://")){
             // image has no url or already is an https resource. bail!
-           callback(url);
+           return linkcallback(url);
 
        }else if(url.includes("http://")){
            // try to get the https version
@@ -35,9 +36,11 @@ function getHttpsLinkIfAvailable(url, callback){
            var httpsURL = "https://" + url.substring(url.indexOf(prefix)+ prefix.length);
 
            urlExists(httpsURL, function(err,exists){
-                   if(exists){
-                   		callback(httpsURL);
-                   }
+               if(exists){
+               		return linkcallback(httpsURL);
+               }else{
+               		return linkcallback(false);
+               }
            });
        }
 }
@@ -46,7 +49,8 @@ module.exports = {
 
 	printObject: function(obj){
 		// This is convenience function for logging output of objects nicely
-		console.log("data object:\n" + JSON.stringify(obj, null, '\t') + "\n");
+		// console.log("data object:\n" + JSON.stringify(obj, null, '\t') + "\n");
+		debug("data object:\n%s\n", JSON.stringify(obj, null, '\t'));
 	},
 
 	fetchTagsFromURL: function(url, callback){
@@ -76,12 +80,23 @@ module.exports = {
 					image_src: extractValueFromArrayOfPossibleKeys(data, ['twitter:image:src', 'twitter:image', 'image', 'sailthru.image.full']),
 					target_url: extractValueFromArrayOfPossibleKeys(data, ['url', 'twitter:url'])
 				}
+				/*if(preferHTTPS){
+                    getHttpsLinkIfAvailable(metaObject.image_src,function(newURL){
+               			if(newURL && newURL != metaObject.image_src){
+                            metaObject.image_src = newURL;
+                        }
+                        return callback(metaObject);
+                        
+                    });
 
-				callback(metaObject);
+               	}else{*/
+               		 return callback(metaObject);
+               	//}
+				
 
 			}else {
-				console.log(err);
-				callback({status_code: err});
+				console.log("Error requesting URL. " + err);
+				return callback({status_code: err});
 			}
 		});
 
