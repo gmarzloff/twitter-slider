@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	var slider;
 
-	$.getJSON("../twitter-slider-example/tweets.json", function(data){	// get posts from local json file
+	$.getJSON("../tweets.json", function(data){	// get posts from local json file
 	    var slides = [];
 		var placeholderImg = "https://marzloffmedia.com/images/marzloffmedia_logo.png";
 		
@@ -27,8 +27,6 @@ $(document).ready(function() {
    					content += "<div class=\"owner-comment\">"+ parseURLsInString(data[i].status_text) +"</div></div>";
   				}
 
-			}else{
-				content = generateTweetOnlyCard(data[i]);
 			}
 	        	
 	        $("#slider").append("<div>"+content+"</div>\n");
