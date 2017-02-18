@@ -34,9 +34,7 @@ $(document).ready(function() {
 
 	    slider = $('#slider').leanSlider({
 	        directionNav: '#slider-direction-nav',
-	        controlNav: '#slider-control-nav',
-	        afterChange: function(){
-	        }
+	        controlNav: '#slider-control-nav'
     	});
 
     	$('#slider-control-nav').append("<div id=\"slidercaption\">recent twitter posts</div>");
