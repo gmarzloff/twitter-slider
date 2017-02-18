@@ -7,10 +7,14 @@ $(document).ready(function() {
 		
 		for(var i=0;i<data.length;i++){
 
-			// check if metadata image is empty for the tweet. 
+			// check if metadata exists, and if metadata image is empty for the tweet. 
 			// If so, there is no media involved so present it with tweet-only styling.
-			if(data[i].metadata.image_src == '' && data[i].metadata.target_url == ''){
 
+			if(data[i].hasOwnProperty("metadata") == false){
+				// probably a re-tweet
+				content = generateTweetOnlyCard(data[i]);
+
+			}else if(data[i].metadata.image_src == ""){
 				content = generateTweetOnlyCard(data[i]);
 
 			}else{
@@ -43,10 +47,14 @@ $(document).ready(function() {
 function generateTweetOnlyCard(tweet){
 	var htmlString = '<div class="tweet-only-card"><div class="logo"><img src="img/twitter_logo.png" /></div>'+
 					 '<div class="tweet-text"><p>' + tweet.status_text + '</p>';
-
-	if(tweet.metadata.description.length > 0){
-		htmlString +=  '<p>' + tweet.metadata.description + '</p>';
+	
+	if(tweet.hasOwnProperty("metadata")){
+		
+		if(tweet.metadata.description.length > 0){
+			htmlString +=  '<p>' + tweet.metadata.description + '</p>';
+		}
 	}
+	
 	htmlString = parseURLsInString(htmlString);
 	htmlString += '</div></div>';
 
