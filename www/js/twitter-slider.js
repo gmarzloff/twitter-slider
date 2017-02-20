@@ -3,7 +3,6 @@ $(document).ready(function() {
 
 	$.getJSON("../tweets.json", function(data){	// get posts from local json file
 	    var slides = [];
-		var placeholderImg = "https://marzloffmedia.com/images/marzloffmedia_logo.png";
 		
 		for(var i=0;i<data.length;i++){
 
