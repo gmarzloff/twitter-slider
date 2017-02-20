@@ -183,7 +183,7 @@ function writeTweetsToFile(){
     if(err){
       return console.log("error: " + err);
     }
-    console.log('File saved on ' + printDateAndTime() + 'to: ' + full_path_filename_string);
+    console.log('File saved on ' + printDateAndTime() + ' to: ' + full_path_filename_string);
   });
 
 }
