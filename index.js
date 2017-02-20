@@ -3,12 +3,15 @@
 // This is the node.js script index.js to run server-side
 // ideally running as a cron script
 
+require('events').EventEmitter.prototype._maxListeners = 100;   // test to allow more listeners as fix for bug, but this does not help
+
 var Twitter = require('twitter'),
          fs = require('fs'),
 	     path = require('path'),
      config = require('./config/config'),
        meta = require('./meta_utils'),
-    crontab = require('node-crontab');
+    crontab = require('node-crontab')
+      debug = require('debug')('index');
 
 var client = new Twitter(config.twitter);
 
@@ -49,13 +52,14 @@ function doGetStatusUpdates(){
       // scrape the meta-tags for title, description, image-src
 
       var tasksRemainingCount = tweets.length;
+      debug('Total tweets to parse through: %d', tasksRemainingCount);
 
       for(i=0;i<tweets.length;i++){
         
         var t = tweets[i];        // convenience var
         var populated_url = '';   // parsing to get the url, depending on whether the status is new or retweet
 
-        // meta.printObject(t);   // Uncomment to output data response retrieved from the Twitter API
+        // meta.printObject(data));   // Uncomment to output data response retrieved from the Twitter API
 
         filtered_tweets[i] = {
           created_at: t.created_at,
@@ -64,59 +68,112 @@ function doGetStatusUpdates(){
           display_url: (t.entities.urls[0] != undefined && t.entities.urls[0].display_url != undefined) ? t.entities.urls[0].display_url : ""
         };
 
-        if (("urls" in t.entities) && (t.entities.urls.length > 0) && ("expanded_url" in t.entities.urls[0])) {
-          populated_url = t.entities.urls[0].expanded_url;
+        // if (("urls" in t.entities) && (t.entities.urls.length > 0) && ("expanded_url" in t.entities.urls[0])) {
+        //   populated_url = t.entities.urls[0].expanded_url;
         
-        }else if(("retweeted_status" in t) && ("urls" in t.retweeted_status.entities) && (t.retweeted_status.entities.urls.length>0)) {
+        // }else if(("retweeted_status" in t) && ("urls" in t.retweeted_status.entities) && (t.retweeted_status.entities.urls.length>0)) {
 
-          if("expanded_url" in t.retweeted_status.entities.urls[0]) {
-            // the url is within the retweet object 
-            populated_url = t.retweeted_status.entities.urls[0].expanded_url;
-          }
-        }
+        //   if("expanded_url" in t.retweeted_status.entities.urls[0]) {
+        //     // the url is within the retweet object 
+        //     populated_url = t.retweeted_status.entities.urls[0].expanded_url;
+        //   }
+        // }
 
-        if(populated_url.length>0){
-          
-          fetchWrapper(i,populated_url,function(){
-              tasksRemainingCount--;
-              console.log('Processing tweet. ' + tasksRemainingCount + ' remaining.');
+        // if(populated_url.length>0){
+        //     debug('attempting to fetch with populated_url: (#%d) %s',tasksRemainingCount-i,populated_url);
+        //     fetchWrapper(i,populated_url,function(){
+                
+        //         debug('#%d: Processed tweet.', tasksRemainingCount);
+        //         tasksRemainingCount--;
 
-              if(tasksRemainingCount==0){
+        //         if(tasksRemainingCount==0){
+        //           // all tweets have been processed. save filtered_tweets object to file
+        //           // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
+        //           writeTweetsToFile();
+        //         }
+        //     });
+        //   }else{
+        //     debug('#%d: No url could be found for this status.', tasksRemainingCount);
+        //     tasksRemainingCount--;
+
+        //      if(tasksRemainingCount==0){
+        //         // all tweets have been processed. save filtered_tweets object to file
+        //         // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
+        //         writeTweetsToFile();
+        //       }
+        //   }
+
+        findaURLFromTweetObject(t,function(error, extracted_url){
+
+          if(error){
+            debug('Error: %s',error);
+
+          }else if(extracted_url.length>0){
+            debug('attempting to fetch with extracted_url: (#%d) %s',tasksRemainingCount-i,extracted_url);
+            fetchWrapper(i,extracted_url,function(){
+                
+                debug('#%d: Processed tweet.', tasksRemainingCount);
+                tasksRemainingCount--;
+
+                if(tasksRemainingCount==0){
+                  // all tweets have been processed. save filtered_tweets object to file
+                  // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
+                  writeTweetsToFile();
+                }
+            });
+
+          }else{
+            debug('#%d: No url could be found for this status.', tasksRemainingCount);
+            tasksRemainingCount--;
+
+             if(tasksRemainingCount==0){
                 // all tweets have been processed. save filtered_tweets object to file
                 // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
                 writeTweetsToFile();
               }
-          });
+          }
 
-        }else{
-          console.log("No url could be found for this status.");
-          tasksRemainingCount--;
-
-           if(tasksRemainingCount==0){
-              // all tweets have been processed. save filtered_tweets object to file
-              // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
-              writeTweetsToFile();
-            }
-        }
+        });
 
       } // end of for loop
     
     }else{ // end if(!error)
-      console.log(err);
+      console.log(error);
     } 
 
   });
 }
 
 function fetchWrapper(index, found_url, callback){
-   // this wrapper function is needed because we use a callback within a for loop and need to refer to
-   // the iteration index somehow.
+  // this wrapper function is needed because we use a callback within a for loop and need to refer to
+  // the iteration index somehow.
+  debug('attempting to fetchTagsFromURL: %s',found_url);
   meta.fetchTagsFromURL(found_url, function(data){
     
+    debug('found json from %s : %s',found_url,data);   // Uncomment to output data response retrieved from the Twitter API
+
     filtered_tweets[index].metadata = data;
     callback();
+    return;
 
   });
+}
+
+function findaURLFromTweetObject(obj, callback){
+
+  var found_url =''; 
+
+  if (("urls" in obj.entities) && (obj.entities.urls.length > 0) && ("expanded_url" in obj.entities.urls[0])) {
+    found_url = obj.entities.urls[0].expanded_url;
+  
+  }else if(("retweeted_status" in obj) && ("urls" in obj.retweeted_status.entities) && (obj.retweeted_status.entities.urls.length>0)) {
+
+    if("expanded_url" in obj.retweeted_status.entities.urls[0]) {
+      // the url is within the retweet object 
+      found_url = obj.retweeted_status.entities.urls[0].expanded_url;
+    }
+  }
+  callback(null,found_url);
 }
 
 function writeTweetsToFile(){
@@ -126,7 +183,7 @@ function writeTweetsToFile(){
     if(err){
       return console.log("error: " + err);
     }
-    console.log("File saved on " + printDateAndTime() + " to: " + full_path_filename_string);
+    console.log('File saved on ' + printDateAndTime() + 'to: ' + full_path_filename_string);
   });
 
 }
