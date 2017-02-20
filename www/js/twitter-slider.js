@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	var slider;
 
-	$.getJSON("../tweets.json", function(data){	// get posts from local json file
+	$.getJSON("tweets.json", function(data){	// get posts from local json file
 	    var slides = [];
 		
 		for(var i=0;i<data.length;i++){
