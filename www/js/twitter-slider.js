@@ -37,9 +37,13 @@ $(document).ready(function() {
     	});
 
     	$('#slider-control-nav').append("<div id=\"slidercaption\">recent twitter posts</div>");
+
+    	// After slider has loaded content, adjust initial height to the first slide height
+    	$("#slider").css({height: $(".lean-slider-slide:nth-child(1)").height()});
 	});
 
 });
+
 function propertyExistsAndIsDefined(obj, prop){
 	if(obj.hasOwnProperty(prop)){
 		if(obj.prop != '' && obj.prop !== "undefined"){
