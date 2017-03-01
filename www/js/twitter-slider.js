@@ -20,7 +20,7 @@ $(document).ready(function() {
 
 		        content = propertyExistsAndIsDefined(data[i],"url") ?  "<div class=\"tweet_img\"><a href=\""+data[i].url+"\">" : "";
 				content += "<img src=\"" + data[i].metadata.image_src + "\" />";
-				content += "</a></div>\n<div class=\"tweet_details\"><h3><a href=\""+data[i].url+"\">"+data[i].metadata.title+"</a></h3>\n<p>"+( data[i].summary ? parseURLsInString(data[i].summary) : "") +"</p>\n";
+				content += "</a></div>\n<div class=\"tweet_details\"><h3><a href=\""+data[i].url+"\">"+data[i].metadata.title+"</a></h3>\n<p>"+( data[i].metadata.description ? parseURLsInString(data[i].metadata.description) : "") +"</p>\n";
      		
  				if(data[i].status_text.length>0){
    					content += "<div class=\"owner-comment\">"+ parseURLsInString(data[i].status_text) +"</div></div>";
