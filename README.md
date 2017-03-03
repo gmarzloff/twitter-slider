@@ -45,6 +45,13 @@ The tweet objects produced in the json have the following structure:
   // etc
 ]
 ```
+
+### Notes ###
+
+The index.js script retrieves data from a twitter feed, and then if there are insufficient properties stored for a tweet, the url is followed to the final target using [needle](https://www.npmjs.com/package/needle), and any useful metadata are merged from that location. 
+
+If you are running this on an https web server, any fetching of http:// files (i.e. the preview images) may give you a warning in the browser. To check for and prefer https image URLs, keep `settings.prefer_https` true (default:true) in [meta_utils.js](https://github.com/gmarzloff/twitter-slider/blob/master/meta_utils.js).
+
 ## Front-end Slider
 
 The slider is available in the www/ folder. You can create a symbolic link to your web server directory. For example, if you are using default Apache settings and your www folder is `/var/www`, type this: 
