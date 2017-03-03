@@ -1,13 +1,14 @@
-var getMeta = require("lets-get-meta"),
+var getMeta = require('lets-get-meta'),
          fs = require('fs'),
 	   path = require('path'),
-	request = require('request'),
-
+	needle = require('needle'),
   urlExists = require('url-exists'),
       debug = require('debug')('meta_utils');
 
-var preferHTTPS = true;        // If true, will try to get the https link for images to avoid non-SSL material
-                               //loading on your personal https domain.
+var settings = {
+	prefer_https: true 		// If true, will try to get the https link for images to avoid non-SSL material
+							//loading on your personal https domain.
+}
 
 function extractValueFromArrayOfPossibleKeys(data, keys) {
 	
@@ -57,53 +58,33 @@ module.exports = {
 
 	fetchTagsFromURL: function(url, callback){
 
-		var options = {
-			url: url,
-			followRedirect: true,
-			maxRedirects: 15,
-			removeRefererHeader: true,
-			headers: {
-				'User-Agent': 'curl/7.49.1',	// spoof curl to obtain the target link
-				accept: '*/*'	
-			}
-		};
+		needle.get(url,{follow_max: 10, follow_set_referer: true},function(error,response){
 
-		request.get(options, function(err, response, body){
+			if (!error && response.statusCode == 200){
+				var data = getMeta(response.body);
 
-			if(!err && response.statusCode == 200){
-
-				var data = getMeta(body);
-
-				// module.exports.printObject(data); // Uncmoment to log object created from metadata
-				
 				var metaObject = {
-					title: extractValueFromArrayOfPossibleKeys(data, ['title', 'twitter:title']),
-					description: extractValueFromArrayOfPossibleKeys(data, ['description', 'twitter:description']),
-					image_src: extractValueFromArrayOfPossibleKeys(data, ['twitter:image:src', 'twitter:image', 'image', 'sailthru.image.full']),
-					target_url: extractValueFromArrayOfPossibleKeys(data, ['url', 'twitter:url'])
+					title: extractValueFromArrayOfPossibleKeys(data, ['title', 'twitter:title', 'og:title']),
+					description: extractValueFromArrayOfPossibleKeys(data, ['description', 'twitter:description', 'og:description']),
+					image_src: extractValueFromArrayOfPossibleKeys(data, ['twitter:image:src', 'twitter:image', 'image', 'sailthru.image.full', 'og:image']),
+					target_url: extractValueFromArrayOfPossibleKeys(data, ['url', 'twitter:url', 'og:url'])
 				}
 
-				/*if(preferHTTPS){
-                    getHttpsLinkIfAvailable(metaObject.image_src,function(newURL){
-               			if(newURL && newURL != metaObject.image_src){
-                            metaObject.image_src = newURL;
-                        }
-                        return callback(metaObject);
-                        
-                    });
-
-               	}else{*/
-               		return callback(metaObject);
-               	//}
-	
-
-
-			}else {
-				console.log("Error requesting URL. " + err);
-				return callback({status_code: err});
+			    if(settings.prefer_https){
+					getHttpsLinkIfAvailable(metaObject.image_src,function(newURL){
+			   			if(newURL){
+			                metaObject.image_src = newURL;
+			            }
+			            return callback(metaObject);
+			        });
+			   	}else{
+			   		return callback(metaObject);
+			   	}			   	
+			}else{
+				debug("Error requesting URL. " + error);
+				return callback({status_code: error});
 			}
 		});
-
 	}
 }
 
