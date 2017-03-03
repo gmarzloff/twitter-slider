@@ -21,7 +21,7 @@ var params = {
   // defines the filtering parameters. See descriptions here: 
   // https://dev.twitter.com/rest/reference/get/statuses/user_timeline
   screen_name: config.twitter.screen_name,
-  count: 15,                                // how many results do you want to receive?
+  count: 20,                                // how many results do you want to receive?
   include_rts: 1,                           // include re-tweets?
   trim_user: true,                          // avoid the entire user object for every tweet
   exclude_replies: true,
@@ -43,7 +43,6 @@ var fetch_tweets_cronjob = crontab.scheduleJob("*/30 * * * *", function(){
 });
 
 function doGetStatusUpdates(){
-
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
     if (!error) {
 
@@ -52,88 +51,59 @@ function doGetStatusUpdates(){
       // scrape the meta-tags for title, description, image-src
 
       var tasksRemainingCount = tweets.length;
-      debug('Total tweets to parse through: %d', tasksRemainingCount);
+      debug('Total tweets to parse: %d', tasksRemainingCount);
 
       for(i=0;i<tweets.length;i++){
         
         var t = tweets[i];        // convenience var
-        var populated_url = '';   // parsing to get the url, depending on whether the status is new or retweet
+        var expanded_url_for_deeper_digging = '';   // parsing to get the url, depending on whether the status is new or retweet
 
         // meta.printObject(data));   // Uncomment to output data response retrieved from the Twitter API
 
-        filtered_tweets[i] = {
+        filtered_tweets[i] = {      // here we filter and clean up relevant properties into an object
           created_at: t.created_at,
           status_text: t.text,
           url: (t.entities.urls[0] != undefined && t.entities.urls[0].url != undefined) ? t.entities.urls[0].url  : "",
           display_url: (t.entities.urls[0] != undefined && t.entities.urls[0].display_url != undefined) ? t.entities.urls[0].display_url : ""
         };
 
-        // if (("urls" in t.entities) && (t.entities.urls.length > 0) && ("expanded_url" in t.entities.urls[0])) {
-        //   populated_url = t.entities.urls[0].expanded_url;
+        // Check for the existence of an expanded_url which will be requested to get more metadata.
+        if (("urls" in t.entities) && (t.entities.urls.length > 0) && ("expanded_url" in t.entities.urls[0])) {
+          expanded_url_for_deeper_digging = t.entities.urls[0].expanded_url;
         
-        // }else if(("retweeted_status" in t) && ("urls" in t.retweeted_status.entities) && (t.retweeted_status.entities.urls.length>0)) {
+        // retweets have a different object structure so they are handled here
+        }else if(("retweeted_status" in t) && ("urls" in t.retweeted_status.entities) && (t.retweeted_status.entities.urls.length>0)) {
 
-        //   if("expanded_url" in t.retweeted_status.entities.urls[0]) {
-        //     // the url is within the retweet object 
-        //     populated_url = t.retweeted_status.entities.urls[0].expanded_url;
-        //   }
-        // }
+          if("expanded_url" in t.retweeted_status.entities.urls[0]) {
+            // the url is within the retweet object 
+            expanded_url_for_deeper_digging = t.retweeted_status.entities.urls[0].expanded_url;
+          }
+        }
 
-        // if(populated_url.length>0){
-        //     debug('attempting to fetch with populated_url: (#%d) %s',tasksRemainingCount-i,populated_url);
-        //     fetchWrapper(i,populated_url,function(){
-                
-        //         debug('#%d: Processed tweet.', tasksRemainingCount);
-        //         tasksRemainingCount--;
+        if(expanded_url_for_deeper_digging.length>0){
+          // An expanded URL exists, so now fish for more metadata at this url
 
-        //         if(tasksRemainingCount==0){
-        //           // all tweets have been processed. save filtered_tweets object to file
-        //           // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
-        //           writeTweetsToFile();
-        //         }
-        //     });
-        //   }else{
-        //     debug('#%d: No url could be found for this status.', tasksRemainingCount);
-        //     tasksRemainingCount--;
+          fetchWrapper(i, expanded_url_for_deeper_digging, function(data){
+              
+              tasksRemainingCount--;
 
-        //      if(tasksRemainingCount==0){
-        //         // all tweets have been processed. save filtered_tweets object to file
-        //         // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
-        //         writeTweetsToFile();
-        //       }
-        //   }
-
-        findaURLFromTweetObject(t,function(error, extracted_url){
-
-          if(error){
-            debug('Error: %s',error);
-
-          }else if(extracted_url.length>0){
-            debug('attempting to fetch with extracted_url: (#%d) %s',tasksRemainingCount-i,extracted_url);
-            fetchWrapper(i,extracted_url,function(){
-                
-                debug('#%d: Processed tweet.', tasksRemainingCount);
-                tasksRemainingCount--;
-
-                if(tasksRemainingCount==0){
-                  // all tweets have been processed. save filtered_tweets object to file
-                  // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
-                  writeTweetsToFile();
-                }
-            });
-
-          }else{
-            debug('#%d: No url could be found for this status.', tasksRemainingCount);
-            tasksRemainingCount--;
-
-             if(tasksRemainingCount==0){
+              if(tasksRemainingCount==0){
                 // all tweets have been processed. save filtered_tweets object to file
                 // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
                 writeTweetsToFile();
               }
-          }
+          });
 
-        });
+        }else{
+          debug('#%d: No url could be found for this status.', tasksRemainingCount);
+          tasksRemainingCount--;
+
+           if(tasksRemainingCount==0){
+              // all tweets have been processed. save filtered_tweets object to file
+              // filtered_tweets.sort(dateSortFunction); // Uncomment if you want to sort in ascending time order
+              writeTweetsToFile();
+            }
+        }
 
       } // end of for loop
     
@@ -147,33 +117,16 @@ function doGetStatusUpdates(){
 function fetchWrapper(index, found_url, callback){
   // this wrapper function is needed because we use a callback within a for loop and need to refer to
   // the iteration index somehow.
-  debug('attempting to fetchTagsFromURL: %s',found_url);
+
   meta.fetchTagsFromURL(found_url, function(data){
     
-    debug('found json from %s : %s',found_url,data);   // Uncomment to output data response retrieved from the Twitter API
+    debug('found json from %s :',found_url);   // Uncomment to output data response retrieved from the Twitter API
+    meta.printObject(data);
 
     filtered_tweets[index].metadata = data;
-    callback();
-    return;
+    callback(data);
 
   });
-}
-
-function findaURLFromTweetObject(obj, callback){
-
-  var found_url =''; 
-
-  if (("urls" in obj.entities) && (obj.entities.urls.length > 0) && ("expanded_url" in obj.entities.urls[0])) {
-    found_url = obj.entities.urls[0].expanded_url;
-  
-  }else if(("retweeted_status" in obj) && ("urls" in obj.retweeted_status.entities) && (obj.retweeted_status.entities.urls.length>0)) {
-
-    if("expanded_url" in obj.retweeted_status.entities.urls[0]) {
-      // the url is within the retweet object 
-      found_url = obj.retweeted_status.entities.urls[0].expanded_url;
-    }
-  }
-  callback(null,found_url);
 }
 
 function writeTweetsToFile(){
