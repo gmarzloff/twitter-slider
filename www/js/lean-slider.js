@@ -154,7 +154,7 @@
             // this will stop the facebook box height adjustment animations if off-screen
             // uses jquery-visible https://github.com/customd/jquery-visible/
 
-            if($('.slider-wrapper').visible()) {
+            if($('.slider-wrapper').visible(true)) {
                 $('#slider').animate({height:$(slides[currentSlide]).height()});
             }
             
